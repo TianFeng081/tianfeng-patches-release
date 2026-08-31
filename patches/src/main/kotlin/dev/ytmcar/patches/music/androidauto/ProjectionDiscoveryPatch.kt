@@ -34,6 +34,8 @@ val ytmCarProjectionDiscoveryPatch = resourcePatch(
     execute {
         document("AndroidManifest.xml").use { doc ->
             val manifest = doc.documentElement
+            val application = manifest.getElementsByTagName("application").item(0) as? Element
+                ?: throw PatchException("Missing application element")
 
             var automotiveFeatureFound = false
             val features = manifest.getElementsByTagName("uses-feature")
@@ -45,24 +47,25 @@ val ytmCarProjectionDiscoveryPatch = resourcePatch(
                     break
                 }
             }
+
             if (!automotiveFeatureFound) {
-                throw PatchException("Missing $AUTOMOTIVE_FEATURE uses-feature")
-            }
-
-            val application = manifest.getElementsByTagName("application").item(0) as? Element
-                ?: throw PatchException("Missing application element")
-
-            val aaosMetadata = application.directChildElements("meta-data")
-                .firstOrNull { it.androidAttribute("name") == AAOS_META }
-                ?: throw PatchException("Missing $AAOS_META metadata")
-
-            val descriptor = aaosMetadata.androidAttribute("resource")
-            if (descriptor.isBlank()) {
-                throw PatchException("$AAOS_META metadata has no android:resource")
+                val feature = doc.createElement("uses-feature").apply {
+                    setAndroidAttribute("name", AUTOMOTIVE_FEATURE)
+                    setAndroidAttribute("required", "false")
+                }
+                manifest.insertBefore(feature, application)
             }
 
             val existingDiscovery = application.directChildElements("meta-data")
                 .firstOrNull { it.androidAttribute("name") == AA_DISCOVERY_META }
+            val aaosMetadata = application.directChildElements("meta-data")
+                .firstOrNull { it.androidAttribute("name") == AAOS_META }
+
+            val descriptor = sequenceOf(existingDiscovery, aaosMetadata)
+                .filterNotNull()
+                .map { it.androidAttribute("resource") }
+                .firstOrNull { it.isNotBlank() }
+                ?: throw PatchException("Missing Android Auto/Automotive app descriptor metadata")
 
             if (existingDiscovery != null) {
                 existingDiscovery.setAndroidAttribute("resource", descriptor)
