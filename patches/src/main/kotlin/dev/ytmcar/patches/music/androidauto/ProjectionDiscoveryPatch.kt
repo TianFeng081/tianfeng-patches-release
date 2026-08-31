@@ -25,8 +25,8 @@ private fun Element.directChildElements(tagName: String): Sequence<Element> = se
 
 @Suppress("unused")
 val ytmCarProjectionDiscoveryPatch = resourcePatch(
-    name = "YTM CAR - Android Auto projection discovery",
-    description = "Makes the CAR_RELEASE build discoverable by phone-side Android Auto using its existing media/template descriptor.",
+    name = "Specific | YouTube Music CAR | Android Auto projection discovery",
+    description = "App-specific patch that makes the CAR_RELEASE build discoverable by phone-side Android Auto using its existing media/template descriptor.",
     default = false,
 ) {
     compatibleWith(YTM_CAR_COMPATIBILITY)
