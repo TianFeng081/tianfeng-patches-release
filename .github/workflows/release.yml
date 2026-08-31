@@ -53,10 +53,10 @@ jobs:
             --with-packages \
             --with-versions > morphe-patches-list.txt
           cat morphe-patches-list.txt
-          grep -F 'YTM CAR - Certificate compatibility' morphe-patches-list.txt
-          grep -F 'YTM CAR - Browse and search' morphe-patches-list.txt
-          grep -F 'YTM CAR - Android Auto projection discovery' morphe-patches-list.txt
-          grep -F 'YTM CAR - Full Android Auto app-side features' morphe-patches-list.txt
+          grep -F 'Specific | YouTube Music CAR | Certificate compatibility' morphe-patches-list.txt
+          grep -F 'Specific | YouTube Music CAR | Browse and search' morphe-patches-list.txt
+          grep -F 'Specific | YouTube Music CAR | Android Auto projection discovery' morphe-patches-list.txt
+          grep -F 'Specific | YouTube Music CAR | Full Android Auto app-side features' morphe-patches-list.txt
           grep -F 'com.google.android.apps.youtube.music' morphe-patches-list.txt
           grep -F '9.34.22' morphe-patches-list.txt
 
@@ -69,13 +69,13 @@ jobs:
           MPP="$(find patches/build/libs -maxdepth 1 -name '*.mpp' -type f | head -n 1)"
           test -n "$VERSION"
           test -n "$MPP"
-          ASSET="ytm-car-patches-${VERSION}.mpp"
+          ASSET="tianfeng-patches-${VERSION}.mpp"
           cp "$MPP" "$ASSET"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$ASSET" --clobber
           else
             gh release create "$TAG" "$ASSET" \
               --target "$GITHUB_SHA" \
-              --title "YTM CAR Patches ${TAG}" \
-              --notes "Morphe patch bundle for YouTube Music 9.34.22 CAR_RELEASE (version code 93422540). Includes certificate compatibility, browse/search, Android Auto projection discovery, and the full app-side features convenience patch."
+              --title "TianFeng Patches ${TAG}" \
+              --notes "Morphe patch bundle with app-specific and universal patch categories. Version ${VERSION} currently includes app-specific YouTube Music CAR_RELEASE Android Auto patches."
           fi
