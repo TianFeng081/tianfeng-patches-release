@@ -10,8 +10,8 @@ import app.morphe.patcher.patch.bytecodePatch
  */
 @Suppress("unused")
 val ytmCarBrowseSearchPatch = bytecodePatch(
-    name = "YTM CAR - Browse and search",
-    description = "Enables the CAR build's existing Android Auto browse/search path, including song search where the host exposes it.",
+    name = "Specific | YouTube Music CAR | Browse and search",
+    description = "App-specific patch that enables the CAR build's existing Android Auto browse/search path, including song search where the host exposes it.",
     default = false,
 ) {
     compatibleWith(YTM_CAR_COMPATIBILITY)
