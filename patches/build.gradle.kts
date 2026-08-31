@@ -1,9 +1,9 @@
-group = "dev.ytmcar"
+group = "dev.tianfeng.patches"
 
 patches {
     about {
-        name = "YTM CAR Patches"
-        description = "YouTube Music CAR patches for Android Auto app-side compatibility"
+        name = "TianFeng Patches"
+        description = "Personal Morphe patches for supported Android apps"
         source = "https://github.com/TianFeng081/ytm-car-patches-release"
         author = "TianFeng081"
         contact = "https://github.com/TianFeng081"
