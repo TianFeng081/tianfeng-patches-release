@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-08-31T12:15:08",
-  "description": "TianFeng Patches 1.0.2. Personal Morphe patch bundle with app-specific and universal patch categories. This release currently includes app-specific YouTube Music CAR_RELEASE Android Auto patches.",
-  "download_url": "https://github.com/TianFeng081/ytm-car-patches-release/releases/download/v1.0.2/tianfeng-patches-1.0.2.mpp",
+  "created_at": "2026-08-31T12:42:07",
+  "description": "TianFeng Patches 1.0.3. Fixes Android Auto projection discovery for manifests that do not contain android.hardware.type.automotive by adding the optional feature when missing, while reusing an existing Android Auto/Automotive app descriptor.",
+  "download_url": "https://github.com/TianFeng081/ytm-car-patches-release/releases/download/v1.0.3/tianfeng-patches-1.0.3.mpp",
   "signature_download_url": "",
-  "version": "1.0.2"
+  "version": "1.0.3"
 }
