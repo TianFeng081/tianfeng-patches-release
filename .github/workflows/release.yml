@@ -47,10 +47,15 @@ jobs:
             https://github.com/MorpheApp/morphe-desktop/releases/download/v1.14.0/morphe-desktop-1.14.0-all.jar
           MPP="$(find patches/build/libs -maxdepth 1 -name '*.mpp' -type f | head -n 1)"
           test -n "$MPP"
-          java -jar morphe-desktop.jar list-patches \
+          "$JAVA_HOME/bin/java" -version
+          "$JAVA_HOME/bin/java" -jar morphe-desktop.jar list-patches \
             --patches "$MPP" \
             --with-packages \
             --with-versions > morphe-patches-list.txt
+          cat morphe-patches-list.txt
+          grep -F 'YTM CAR - Certificate compatibility' morphe-patches-list.txt
+          grep -F 'YTM CAR - Browse and search' morphe-patches-list.txt
+          grep -F 'YTM CAR - Android Auto projection discovery' morphe-patches-list.txt
           grep -F 'YTM CAR - Full Android Auto app-side features' morphe-patches-list.txt
           grep -F 'com.google.android.apps.youtube.music' morphe-patches-list.txt
           grep -F '9.34.22' morphe-patches-list.txt
