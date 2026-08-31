@@ -1,11 +1,14 @@
-# YTM CAR Patches Release
+# TianFeng Patches
 
-Morphe-compatible patch bundle for the official YouTube Music `9.34.22 CAR_RELEASE` APK.
+Personal Morphe patch bundle for supported Android apps.
 
+Current supported target:
+
+- App: YouTube Music CAR_RELEASE
 - Package: `com.google.android.apps.youtube.music`
 - Version: `9.34.22`
 - Tested version code: `93422540`
-- Bundle version: `1.0.0`
+- Bundle version: `1.0.1`
 
 ## Included patches
 
@@ -18,10 +21,10 @@ The full patch depends on the other three and enables the app-side Android Auto 
 
 ## Download
 
-Use the `.mpp` asset from the latest GitHub Release.
+Use the `.mpp` asset from the latest GitHub Release, or add this repository as a Remote source in Morphe Manager.
 
 ## Scope
 
 This patch set does not patch Premium/subscription entitlement and does not modify Android Auto host/vehicle driving or distraction policy.
 
-This repository contains patch source and build automation only. It does not contain the YouTube Music APK.
+This repository contains patch source and build automation only. It does not contain application APK files.
