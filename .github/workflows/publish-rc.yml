@@ -1,0 +1,40 @@
+name: Publish RC
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/publish-rc.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download verified RC artifact
+        run: |
+          curl -L --fail --retry 3 \
+            -o rc.zip \
+            'https://sdmntprwestus3.oaiusercontent.com/files/00000000-3f10-81fd-a057-e9404ee7978b/raw?se=2026-08-31T14%3A55%3A45Z&sp=r&sv=2026-02-06&sr=b&scid=15ffc8b7-a2d3-5f99-bb56-4d78d8900657&skoid=cb94e22a-e3df-4e6a-9e17-1696f40fa435&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-08-30T22%3A02%3A43Z&ske=2026-08-31T22%3A02%3A43Z&sks=b&skv=2026-02-06&sig=0xGH6b80ux%2BWuiu4cqmEuXdwKfxQhWB/AMQ8NjXL%2Bn8%3D'
+          unzip -q rc.zip -d rc
+          MPP="$(find rc -type f -name '*.mpp' | head -n 1)"
+          test -n "$MPP"
+          cp "$MPP" tianfeng-patches-1.0.4-rc.1.mpp
+          sha256sum tianfeng-patches-1.0.4-rc.1.mpp
+
+      - name: Create prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v1.0.4-rc.1 \
+            tianfeng-patches-1.0.4-rc.1.mpp \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title 'TianFeng Patches v1.0.4-rc.1' \
+            --notes 'Prerelease test build. Fixes YouTube Music CAR Android Auto projection discovery when the APK has no Android Auto/Automotive descriptor metadata by creating a standalone media descriptor. This RC intentionally does not include a duplicate certificate compatibility patch; use Morphe original Bypass certificate checks for that functionality. Stable Remote Source remains on v1.0.3.'
