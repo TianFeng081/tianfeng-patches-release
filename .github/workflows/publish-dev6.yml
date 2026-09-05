@@ -23,13 +23,25 @@ jobs:
         run: |
           set -euo pipefail
           echo 'dde1aa815f90b0fdca34429b7593728b2c4d9374d4f749256400966810505361  release-assets/dev6/part-00.b64' | sha256sum -c -
-          echo 'e1ffd91f4acaed6cf231ebaa60b14d9714d7deba59850e46aa44b8a5824276e3  release-assets/dev6/part-01.b64' | sha256sum -c -
-          echo '8c8cddc4d65249777bda1dd7d951aa1222ff12294db50fbc289380c33aa339e7  release-assets/dev6/part-02.b64' | sha256sum -c -
+          echo 'bd0e5e08f5aa5fcb63705f63d0fe2043f4f47b9a0365579811c28515fad1b8f9  release-assets/dev6/part-01a.b64' | sha256sum -c -
+          echo '199685d178d02e68006d0a9defbf6a4733d20d270beaac6c31639741e4ebbd92  release-assets/dev6/part-01b.b64' | sha256sum -c -
+          echo '8e68b831563bc6527f81a796f0c5c8680ffa3d3edb3afd6397889377c6d73a59  release-assets/dev6/part-02a.b64' | sha256sum -c -
+          echo 'd1a081e984611dba1b4ee8f7f64b1e80f6b11889dc855c26478e10de4ca6cadb  release-assets/dev6/part-02b.b64' | sha256sum -c -
           echo '686290efa9ca9096db52c369d762643dbd792e27f3bfb974f549c08d0cc86af5  release-assets/dev6/part-03.b64' | sha256sum -c -
           echo '6a85135b1ecac2fe2f72fa894dfb5360ea7bf9e536ebd2a0c13955694f4d553e  release-assets/dev6/part-04.b64' | sha256sum -c -
           echo 'ba01a5d3eafae5222d3653848deb85cbe73a5938320b6336437e76efff4d7988  release-assets/dev6/part-05.b64' | sha256sum -c -
           echo '19b530fdf84f90246c7a1c1204d16469d132565380c0d7a9493366f0fcfbf50b  release-assets/dev6/part-06.b64' | sha256sum -c -
-          cat release-assets/dev6/part-*.b64 | base64 -d > patches-0.0.1-dev.6.mpp
+          cat \
+            release-assets/dev6/part-00.b64 \
+            release-assets/dev6/part-01a.b64 \
+            release-assets/dev6/part-01b.b64 \
+            release-assets/dev6/part-02a.b64 \
+            release-assets/dev6/part-02b.b64 \
+            release-assets/dev6/part-03.b64 \
+            release-assets/dev6/part-04.b64 \
+            release-assets/dev6/part-05.b64 \
+            release-assets/dev6/part-06.b64 \
+            | base64 -d > patches-0.0.1-dev.6.mpp
           echo '062e08783289b034dde72f9d6cba4d4560547c342d7832ac5fd36ef56d62b1cd  patches-0.0.1-dev.6.mpp' | sha256sum -c -
           test "$(stat -c%s patches-0.0.1-dev.6.mpp)" = '27665'
 
