@@ -1,0 +1,45 @@
+name: Publish dev.6
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/publish-dev6.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Reconstruct and verify MPP
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'dde1aa815f90b0fdca34429b7593728b2c4d9374d4f749256400966810505361  release-assets/dev6/part-00.b64' | sha256sum -c -
+          echo 'e1ffd91f4acaed6cf231ebaa60b14d9714d7deba59850e46aa44b8a5824276e3  release-assets/dev6/part-01.b64' | sha256sum -c -
+          echo '8c8cddc4d65249777bda1dd7d951aa1222ff12294db50fbc289380c33aa339e7  release-assets/dev6/part-02.b64' | sha256sum -c -
+          echo '686290efa9ca9096db52c369d762643dbd792e27f3bfb974f549c08d0cc86af5  release-assets/dev6/part-03.b64' | sha256sum -c -
+          echo '6a85135b1ecac2fe2f72fa894dfb5360ea7bf9e536ebd2a0c13955694f4d553e  release-assets/dev6/part-04.b64' | sha256sum -c -
+          echo 'ba01a5d3eafae5222d3653848deb85cbe73a5938320b6336437e76efff4d7988  release-assets/dev6/part-05.b64' | sha256sum -c -
+          echo '19b530fdf84f90246c7a1c1204d16469d132565380c0d7a9493366f0fcfbf50b  release-assets/dev6/part-06.b64' | sha256sum -c -
+          cat release-assets/dev6/part-*.b64 | base64 -d > patches-0.0.1-dev.6.mpp
+          echo '062e08783289b034dde72f9d6cba4d4560547c342d7832ac5fd36ef56d62b1cd  patches-0.0.1-dev.6.mpp' | sha256sum -c -
+          test "$(stat -c%s patches-0.0.1-dev.6.mpp)" = '27665'
+
+      - name: Publish prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v0.0.1-dev.6 \
+            patches-0.0.1-dev.6.mpp \
+            --repo "$GITHUB_REPOSITORY" \
+            --title 'TianFeng Patches v0.0.1-dev.6' \
+            --prerelease \
+            --notes 'Development prerelease for YouTube Music 9.34.52 Android Auto. Makes the MediaBrowser search patch self-contained by applying Android Auto caller certificate compatibility, avoiding the Dynamite Google-signature verifier path, and restoring the original package identity in search_media_items. Enables Android Auto search, speech-to-text search, search results and result selection without modifying Premium entitlements. Truecaller patches remain included.'
