@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-05T18:08:10",
-  "description": "TianFeng Patches 0.0.1-dev.3 development prerelease. Uses Morphe-style action patch names and the standard compatible app name YouTube Music. Compatible package: com.google.android.apps.youtube.music, version 9.34.22. Android Auto behavior is unchanged; certificate bypass remains provided by Morphe original patches.",
-  "download_url": "https://github.com/TianFeng081/tianfeng-patches-release/releases/download/v0.0.1-dev.3/patches-0.0.1-dev.3.mpp",
+  "created_at": "2026-09-05T18:56:34+08:00",
+  "description": "TianFeng Patches 0.0.1-dev.5 development prerelease. YouTube Music 9.34.52 experimental Android Auto MediaBrowser support. Replaces the CAR_RELEASE manifest-based service/projection logic with the search_media_items package-identity unlock. Keep Morphe's Bypass certificate checks selected. Truecaller Hide ads and Disable analytics patches remain included.",
+  "download_url": "https://github.com/TianFeng081/tianfeng-patches-release/releases/download/v0.0.1-dev.5/patches-0.0.1-dev.5.mpp",
   "signature_download_url": "",
-  "version": "0.0.1-dev.3"
+  "version": "0.0.1-dev.5"
 }
