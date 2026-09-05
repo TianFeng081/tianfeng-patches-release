@@ -1,0 +1,34 @@
+name: Publish dev.3
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/publish-dev3.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download validated artifact
+        run: |
+          curl -L --fail --retry 3 -o artifact.zip 'https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-6d28-81fa-8877-18728736b9d5/raw?se=2026-09-05T10%3A12%3A42Z&sp=r&sv=2026-02-06&sr=b&scid=7e3369b5-7ed0-5ef2-9d96-0ce67d148199&skoid=cb94e22a-e3df-4e6a-9e17-1696f40fa435&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-05T05%3A30%3A07Z&ske=2026-09-06T05%3A30%3A07Z&sks=b&skv=2026-02-06&sig=11gq6opD/abnYQRFntYehXt2pJEaexHxwpc5AYe5Q3c%3D'
+          unzip -q artifact.zip
+          test -f patches-0.0.1-dev.3.mpp
+          echo '3e6d3c02a9798969b3fb8b48c96dc87860964ba8582f26dc57eba076557b895c  patches-0.0.1-dev.3.mpp' | sha256sum -c -
+
+      - name: Replace prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: TianFeng081/tianfeng-patches-release
+        run: |
+          gh release delete v0.0.1-dev.2 --yes --cleanup-tag || true
+          gh release create v0.0.1-dev.3 patches-0.0.1-dev.3.mpp \
+            --target 0b5d4ae2d2235e3bb3d65beb9b432e723a5aac5a \
+            --prerelease \
+            --title 'TianFeng Patches v0.0.1-dev.3' \
+            --notes 'Development prerelease. Uses Morphe-style action patch names and the standard compatible app name YouTube Music. Compatible package: com.google.android.apps.youtube.music, version 9.34.22. Android Auto behavior is unchanged; certificate bypass remains provided by Morphe original patches.'
