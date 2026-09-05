@@ -1,0 +1,57 @@
+name: Publish dev.7
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-dev7.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download validated dev.7 artifact
+        run: |
+          curl -L --fail --retry 3 'https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-076c-81fa-ae3b-729880218932/raw?se=2026-09-05T17%3A56%3A42Z&sp=r&sv=2026-02-06&sr=b&scid=1e61c105-11ee-59d7-8f47-f3876f214ff9&skoid=cb94e22a-e3df-4e6a-9e17-1696f40fa435&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-04T23%3A16%3A57Z&ske=2026-09-05T23%3A16%3A57Z&sks=b&skv=2026-02-06&sig=sWn%2B//BdrSM8pkqvSse6dzROelkKG0rAwQozTsxtyIU%3D' -o artifact.zip
+          unzip -o artifact.zip
+          test "$(stat -c %s patches-0.0.1-dev.7.mpp)" = "34520"
+          echo 'acf8f5e3fd0732f634ce7219c7061a799632a4911a3da2737f66040bb8bed717  patches-0.0.1-dev.7.mpp' | sha256sum -c -
+      - name: Create prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v0.0.1-dev.7 patches-0.0.1-dev.7.mpp \
+            --prerelease \
+            --title 'v0.0.1-dev.7' \
+            --notes 'Development prerelease 0.0.1-dev.7. Includes YouTube Music Android Auto patches and Truecaller 26.34.6 Hide ads, Disable analytics, and cosmetic Show Premium appearance patches.'
+      - name: Update main metadata
+        run: |
+          cat > patches-bundle.json <<'EOF'
+          {
+            "created_at": "2026-09-06T01:49:00",
+            "description": "TianFeng Patches 0.0.1-dev.7 development prerelease. Includes the self-contained YouTube Music 9.34.52 Android Auto MediaBrowser patches plus Truecaller 26.34.6 Hide ads, Disable analytics, and Show Premium appearance. The Premium appearance patch is cosmetic only and does not modify subscription entitlements or unlock paid features.",
+            "download_url": "https://github.com/TianFeng081/tianfeng-patches-release/releases/download/v0.0.1-dev.7/patches-0.0.1-dev.7.mpp",
+            "signature_download_url": "",
+            "version": "0.0.1-dev.7"
+          }
+          EOF
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add patches-bundle.json
+          git commit -m 'release: point main metadata to dev.7'
+          git push origin HEAD:main
+          cp patches-bundle.json /tmp/patches-bundle.json
+      - name: Update dev metadata
+        run: |
+          git fetch origin dev
+          git switch dev
+          cp /tmp/patches-bundle.json patches-bundle.json
+          git add patches-bundle.json
+          git commit -m 'release: point dev metadata to dev.7'
+          git push origin HEAD:dev
