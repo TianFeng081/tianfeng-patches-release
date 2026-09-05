@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - '.github/workflows/publish-dev5.yml'
+      - 'release-assets/dev5/**'
 
 permissions:
   contents: write
