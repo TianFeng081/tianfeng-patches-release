@@ -17,10 +17,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Verify validated artifact
+      - name: Rebuild and verify validated artifact
         run: |
-          test -f release-assets/patches-0.0.1-dev.5.mpp
-          echo '3323ac44be91ceb7fc670da6844abe4409b992e486541c301c62b07d0a027cb6  release-assets/patches-0.0.1-dev.5.mpp' | sha256sum -c -
+          cat release-assets/dev5/part-*.b64 | base64 -d > patches-0.0.1-dev.5.mpp
+          echo '3323ac44be91ceb7fc670da6844abe4409b992e486541c301c62b07d0a027cb6  patches-0.0.1-dev.5.mpp' | sha256sum -c -
 
       - name: Replace prerelease
         env:
@@ -28,7 +28,7 @@ jobs:
           GH_REPO: TianFeng081/tianfeng-patches-release
         run: |
           gh release delete v0.0.1-dev.4 --yes --cleanup-tag || true
-          gh release create v0.0.1-dev.5 release-assets/patches-0.0.1-dev.5.mpp \
+          gh release create v0.0.1-dev.5 patches-0.0.1-dev.5.mpp \
             --prerelease \
             --title 'TianFeng Patches v0.0.1-dev.5' \
             --notes 'Development prerelease for YouTube Music 9.34.52. Replaces CAR_RELEASE manifest-based Android Auto logic with the MediaBrowser search unlock targeting ytm_media_browser/search_media_items. Includes Enable Android Auto MediaBrowser search and Enable Android Auto features. Keep Morphe Bypass certificate checks selected. Truecaller patches remain included.'
