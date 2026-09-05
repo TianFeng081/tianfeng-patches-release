@@ -1,0 +1,33 @@
+name: Publish dev.1
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/publish-dev1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download validated artifact
+        run: |
+          curl -L --fail --retry 3 -o artifact.zip 'https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-0e30-81fa-8d68-26a2e79e8b73/raw?se=2026-09-05T09%3A55%3A35Z&sp=r&sv=2026-02-06&sr=b&scid=e87b545d-2859-55b7-a0b9-c486acf84ed3&skoid=cb94e22a-e3df-4e6a-9e17-1696f40fa435&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-04T23%3A14%3A41Z&ske=2026-09-05T23%3A14%3A41Z&sks=b&skv=2026-02-06&sig=wNhUIXnBVfdCbOrOfeCapJEmslYkWJRgxTbH%2Bfd2qEc%3D'
+          unzip -q artifact.zip
+          test -f patches-0.0.1-dev.1.mpp
+          echo 'ba11dd1cc9d5ca76d86642a078e6365932e553ea1b80ad5f6b70cffb9d06e7af  patches-0.0.1-dev.1.mpp' | sha256sum -c -
+
+      - name: Replace prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete v0.0.1-rev1 --yes --cleanup-tag || true
+          gh release create v0.0.1-dev.1 patches-0.0.1-dev.1.mpp \
+            --target 396db5dbc3a7baeb99e7610c91c81ac570732f7d \
+            --prerelease \
+            --title 'TianFeng Patches v0.0.1-dev.1' \
+            --notes 'Development prerelease following Morphe patches naming conventions. Contains the validated YouTube Music 9.34.22 CAR_RELEASE Android Auto browse/search and projection discovery fixes. Certificate bypass remains provided by Morphe original patches.'
