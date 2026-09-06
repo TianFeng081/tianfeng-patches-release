@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-06T11:11:38",
-  "description": "TianFeng Patches 0.0.1-dev.12 development prerelease. Adds NetShort 2.2.9 Signature compatibility for Pairip local APK signature verification while leaving Google Play Licensing and server authorization unchanged.",
-  "download_url": "https://github.com/TianFeng081/tianfeng-patches-release/releases/download/v0.0.1-dev.12/patches-0.0.1-dev.12.mpp",
+  "created_at": "2026-09-06T11:40:10",
+  "description": "TianFeng Patches 0.0.1-dev.13 development prerelease. Fixes NetShort 2.2.9 startup crashes by removing two corrupt hard-coded offline VIP instruction replacements discovered in a real patched APK.",
+  "download_url": "https://github.com/TianFeng081/tianfeng-patches-release/releases/download/v0.0.1-dev.13/patches-0.0.1-dev.13.mpp",
   "signature_download_url": "",
-  "version": "0.0.1-dev.12"
+  "version": "0.0.1-dev.13"
 }
