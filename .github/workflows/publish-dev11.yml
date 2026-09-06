@@ -1,0 +1,61 @@
+name: Publish dev.11
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-dev11.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download validated dev.11 artifact
+        run: |
+          curl -L --fail --retry 3 'https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-d030-81fa-8e36-b032e9286c1b/raw?se=2026-09-06T10%3A37%3A14Z&sp=r&sv=2026-02-06&sr=b&scid=26694338-a51f-52c4-a5df-7b911dab8644&skoid=cb94e22a-e3df-4e6a-9e17-1696f40fa435&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-06T06%3A31%3A50Z&ske=2026-09-07T06%3A31%3A50Z&sks=b&skv=2026-02-06&sig=D2gHfTLPBeYNHVaeAOCBKgMOvyU8qWMg2a0Hwv0G5CQ%3D' -o artifact.zip
+          unzip -o artifact.zip
+          test "$(stat -c %s patches-0.0.1-dev.11.mpp)" = "100865"
+          echo 'f1c68c7e0e38278472dd7ea72465aebb1a9cfb4b784b31b6762ca365170a8576  patches-0.0.1-dev.11.mpp' | sha256sum -c -
+
+      - name: Create prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v0.0.1-dev.11 patches-0.0.1-dev.11.mpp \
+            --prerelease \
+            --title 'TianFeng Patches v0.0.1-dev.11' \
+            --notes 'Development prerelease 0.0.1-dev.11. Fixes NetShort 2.2.9 Force member state for Morphe Manager 1.29.0 / Patcher 1.12.0 by bypassing InlineSmaliCompiler entirely and using prebuilt dexlib2 BuilderInstruction objects. Also aligns the project patcher baseline to 1.12.0.'
+
+      - name: Update main metadata
+        run: |
+          cat > patches-bundle.json <<'EOF'
+          {
+            "created_at": "2026-09-06T10:32:01",
+            "description": "TianFeng Patches 0.0.1-dev.11 development prerelease. Fixes NetShort 2.2.9 Force member state on Morphe Patcher 1.12.0 by bypassing InlineSmaliCompiler and using direct dexlib2 instructions.",
+            "download_url": "https://github.com/TianFeng081/tianfeng-patches-release/releases/download/v0.0.1-dev.11/patches-0.0.1-dev.11.mpp",
+            "signature_download_url": "",
+            "version": "0.0.1-dev.11"
+          }
+          EOF
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add patches-bundle.json
+          git commit -m 'release: point main metadata to dev.11'
+          git push origin HEAD:main
+          cp patches-bundle.json /tmp/patches-bundle.json
+
+      - name: Update dev metadata
+        run: |
+          git fetch origin dev
+          git switch dev
+          cp /tmp/patches-bundle.json patches-bundle.json
+          git add patches-bundle.json
+          git commit -m 'release: point dev metadata to dev.11'
+          git push origin HEAD:dev
