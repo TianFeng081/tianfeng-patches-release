@@ -1,0 +1,61 @@
+name: Publish dev.8
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-dev8.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download validated dev.8 artifact
+        run: |
+          curl -L --fail --retry 3 'https://sdmntprcentralus.oaiusercontent.com/files/00000000-499c-81f5-bcbd-e44fabe2dcd3/raw?se=2026-09-06T09%3A37%3A47Z&sp=r&sv=2026-02-06&sr=b&scid=b7ee5f2c-9f40-5d99-9b89-a87ce55722fb&skoid=cb94e22a-e3df-4e6a-9e17-1696f40fa435&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-06T06%3A32%3A00Z&ske=2026-09-07T06%3A32%3A00Z&sks=b&skv=2026-02-06&sig=0/c%2BBxmdKZYjwByCbrvUqn34c%2BKgx%2BUMHXX6AWmcpm4%3D' -o artifact.zip
+          unzip -o artifact.zip
+          test "$(stat -c %s patches-0.0.1-dev.8.mpp)" = "100094"
+          echo 'f357d76bd82abb82de81d15c7993d166d640598c6332e3fc19ad6bdd312a2563  patches-0.0.1-dev.8.mpp' | sha256sum -c -
+
+      - name: Create prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v0.0.1-dev.8 patches-0.0.1-dev.8.mpp \
+            --prerelease \
+            --title 'TianFeng Patches v0.0.1-dev.8' \
+            --notes 'Development prerelease 0.0.1-dev.8. Adds NetShort 2.2.9 client-side patches: Hide ads, Member state test mode, Member UI access, Hide purchase prompts, and Coin unlock UI test. Existing YouTube Music Android Auto and Truecaller patches remain included. NetShort membership and coin test patches do not modify server playback authorization, play vouchers, or real account balances.'
+
+      - name: Update main metadata
+        run: |
+          cat > patches-bundle.json <<'EOF'
+          {
+            "created_at": "2026-09-06T09:33:00Z",
+            "description": "TianFeng Patches 0.0.1-dev.8 development prerelease. Adds NetShort 2.2.9 client-side patches for ad suppression, member-state UI testing, member UI access, purchase-prompt cleanup, and coin-unlock UI testing. Existing YouTube Music Android Auto and Truecaller patches remain included. NetShort test-state patches do not modify server playback authorization, play vouchers, or real coin balances.",
+            "download_url": "https://github.com/TianFeng081/tianfeng-patches-release/releases/download/v0.0.1-dev.8/patches-0.0.1-dev.8.mpp",
+            "signature_download_url": "",
+            "version": "0.0.1-dev.8"
+          }
+          EOF
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add patches-bundle.json
+          git commit -m 'release: point main metadata to dev.8'
+          git push origin HEAD:main
+          cp patches-bundle.json /tmp/patches-bundle.json
+
+      - name: Update dev metadata
+        run: |
+          git fetch origin dev
+          git switch dev
+          cp /tmp/patches-bundle.json patches-bundle.json
+          git add patches-bundle.json
+          git commit -m 'release: point dev metadata to dev.8'
+          git push origin HEAD:dev
