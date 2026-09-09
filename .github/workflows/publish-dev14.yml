@@ -20,7 +20,7 @@ jobs:
 
       - name: Download validated dev.14 artifact
         run: |
-          curl -L --fail --retry 3 'https://sdmntprindiasocentral.oaiusercontent.com/files/00000000-f374-8211-be35-ecfee22ae75b/raw?se=2026-09-09T15%3A55%3A41Z&sp=r&sv=2026-02-06&sr=b&scid=8290fbcc-c5c0-5624-9ae2-e08bb7ea940c&skoid=cb94e22a-e3df-4e6a-9e17-1696f40fa435&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-09T15%3A33%3A21Z&ske=2026-09-10T15%3A33%3A21Z&sks=b&skv=2026-02-06&sig=MHZqQSPOlT%2B1gefoG/3fqbhySV5aUAdIAbbiaWwQ/8U%3D' -o artifact.zip
+          curl -L --fail --retry 3 'https://sdmntprcentralus.oaiusercontent.com/files/00000000-4f38-81f5-9f9f-54b232f4b468/raw?se=2026-09-09T16%3A35%3A14Z&sp=r&sv=2026-02-06&sr=b&scid=c7f14f4e-e8b0-5299-a0f4-baba931166c2&skoid=cb94e22a-e3df-4e6a-9e17-1696f40fa435&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-09T15%3A33%3A19Z&ske=2026-09-10T15%3A33%3A19Z&sks=b&skv=2026-02-06&sig=UtFEumLyy9pIIUTddWTI%2BUGAf%2BwYuVqkU2DeZwFsuy4%3D' -o artifact.zip
           unzip -o artifact.zip
           test "$(stat -c %s patches-0.0.1-dev.14.mpp)" = "765427"
           echo '93f09ee95d853fe8e75f92c13dd6baf6213c8a546cc5f57d60d48da479e6416d  patches-0.0.1-dev.14.mpp' | sha256sum -c -
