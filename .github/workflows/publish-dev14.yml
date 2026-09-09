@@ -1,0 +1,83 @@
+name: Publish dev.14
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-dev14.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    if: contains(github.event.head_commit.message, 'publish dev.14')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download validated dev.14 artifact
+        run: |
+          curl -L --fail --retry 3 'https://sdmntprindiasocentral.oaiusercontent.com/files/00000000-f374-8211-be35-ecfee22ae75b/raw?se=2026-09-09T15%3A55%3A41Z&sp=r&sv=2026-02-06&sr=b&scid=8290fbcc-c5c0-5624-9ae2-e08bb7ea940c&skoid=cb94e22a-e3df-4e6a-9e17-1696f40fa435&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-09T15%3A33%3A21Z&ske=2026-09-10T15%3A33%3A21Z&sks=b&skv=2026-02-06&sig=MHZqQSPOlT%2B1gefoG/3fqbhySV5aUAdIAbbiaWwQ/8U%3D' -o artifact.zip
+          unzip -o artifact.zip
+          test "$(stat -c %s patches-0.0.1-dev.14.mpp)" = "765427"
+          echo '93f09ee95d853fe8e75f92c13dd6baf6213c8a546cc5f57d60d48da479e6416d  patches-0.0.1-dev.14.mpp' | sha256sum -c -
+          unzip -l patches-0.0.1-dev.14.mpp | grep -F 'extensions/android-auto-playlists.mpe'
+
+      - name: Remove previous dev releases and tags
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mapfile -t DEV_RELEASES < <(gh release list --limit 100 --json tagName --jq '.[].tagName | select(test("-dev\\."))')
+          for tag in "${DEV_RELEASES[@]}"; do
+            echo "Deleting previous development release: $tag"
+            gh release delete "$tag" --yes --cleanup-tag
+          done
+          git fetch --tags --force
+          mapfile -t DEV_TAGS < <(git tag -l '*-dev.*')
+          for tag in "${DEV_TAGS[@]}"; do
+            if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
+              echo "Deleting remaining development tag: $tag"
+              git push origin ":refs/tags/$tag"
+            fi
+          done
+
+      - name: Create dev.14 prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v0.0.1-dev.14 patches-0.0.1-dev.14.mpp \
+            --prerelease \
+            --target main \
+            --title 'TianFeng Patches v0.0.1-dev.14' \
+            --notes 'Development prerelease 0.0.1-dev.14. Adds the YouTube Music 9.34.52 Android Auto search identity patch and Restore Android Auto playlists patch with saved playlists, Liked Music, library pagination and playable MediaBrowser items. The playlist extension is bundled and CI-verified. Existing TianFeng patches from the current source baseline remain included. Premium/subscription entitlements are not modified. This build has passed bundle compilation and Morphe Desktop smoke tests; real-device Android Auto behavior still requires runtime verification.'
+
+      - name: Update main metadata
+        run: |
+          cat > patches-bundle.json <<'EOF'
+          {
+            "created_at": "2026-09-09T15:32:32",
+            "description": "TianFeng Patches 0.0.1-dev.14 prerelease. Adds YouTube Music 9.34.52 Android Auto search identity compatibility and playlist/Liked Music restoration with bundled extension support. Premium and subscription entitlements are unchanged.",
+            "download_url": "https://github.com/TianFeng081/tianfeng-patches-release/releases/download/v0.0.1-dev.14/patches-0.0.1-dev.14.mpp",
+            "signature_download_url": "",
+            "version": "0.0.1-dev.14"
+          }
+          EOF
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add patches-bundle.json
+          git commit -m 'release: point main metadata to dev.14'
+          git push origin HEAD:main
+          cp patches-bundle.json /tmp/patches-bundle.json
+
+      - name: Update dev metadata
+        run: |
+          git fetch origin dev
+          git switch dev
+          cp /tmp/patches-bundle.json patches-bundle.json
+          git add patches-bundle.json
+          git commit -m 'release: point dev metadata to dev.14'
+          git push origin HEAD:dev
